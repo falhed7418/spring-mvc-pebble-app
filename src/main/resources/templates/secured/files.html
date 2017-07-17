@@ -1,0 +1,130 @@
+{% extends "templates/secured/secured.html" %}
+
+{% block title %}Files{% endblock %}
+
+{% block navadditional %}
+{{ parent() }}
+<div class="navbar-form navbar-left">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Upload</button>
+</div>
+{% endblock %}
+
+{% block content %}
+{{ parent() }}
+<table class="table table-bordered table-hover">
+    <thead></thead>
+    <tbody>
+    <tr>
+        <th>#</th>
+        <th>File</th>
+    </tr>
+    {% for file in files %}
+    <tr>
+        <th scope="row">{{ loop.index + 1 }}</th>
+        <td><a href="{{ contextPath }}/secured/download?file={{ file }}">{{ file }}</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="modal fade uploadmodal" tabindex="-1" id="myModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <h4 class="modal-title">uploadDocument</h4>
+            </div>
+            <div class="modal-body">
+                <form class="uploadform" enctype="multipart/form-data">
+                    Select image to upload:
+                    <input type="file" name="file" multiple>
+                    <input type="submit" value="Upload" name="submit">
+                </form>
+                <div class="progress" style="display: none;">
+                    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                    </div>
+                </div>
+                <h4 class="progress-status"></h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary btn-upload">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ parent() }}
+<script>
+    var uploadmodal = $(".uploadmodal");
+    var uploadform = uploadmodal.find(".uploadform");
+    var progress = uploadmodal.find('.progress');
+    var progressBar = progress.find('.progress-bar');
+    var progressStatus = uploadmodal.find('.progress-status');
+    var okbutton = uploadmodal.find('.btn-upload');
+
+    okbutton.on('click', function (e) {
+        location.reload(true);
+    });
+
+    uploadform.on('submit', function (e) {
+        e.preventDefault();
+
+        var fileElement = uploadform.find('input[type=file]')[0];
+        var formData = createFormData(fileElement.files);
+
+        $.ajax({
+            url: "{{ contextPath }}/secured/upload",
+            type: "POST",
+            data: formData,
+            processData: false,  // tell jQuery not to process the data
+            contentType: false,  // tell jQuery not to set contentType
+            xhr: function () {
+                var myXhr = $.ajaxSettings.xhr();
+
+                myXhr.upload.onprogress = function (evt) {
+                    var prgrs = evt.loaded / evt.total * 100;
+                    progressBar.css('width', Math.round(prgrs) + '%');
+                };
+                myXhr.upload.onloadstart = function () {
+                    progress.show();
+                    progressStatus.html("Upload started");
+                };
+                myXhr.upload.onloadend = function () {
+                    progress.hide();
+                    progressStatus.html("Upload finished");
+                    progressBar.css('width', '0%');
+                };
+
+                return myXhr;
+            },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', '{{ _csrf }}');
+            },
+            success: function (data, textStatus, jqXHR) {
+                console.log(data);
+                console.log(textStatus);
+                console.log(jqXHR);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                console.log(textStatus);
+                console.log(errorThrown);
+            }
+        });
+    });
+
+    var createFormData = function (files) {
+        var formData = new FormData();
+
+        $.each(files, function (i, file) {
+            formData.append(file.name, file);
+        });
+
+        return formData;
+    };
+</script>
+<!--action="{{ contextPath }}/secured/upload"-->
+{% endblock %}

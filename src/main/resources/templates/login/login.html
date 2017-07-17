@@ -1,0 +1,74 @@
+{% extends "templates/base.html" %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block style %}
+{{ parent() }}
+<style>
+    .outer {
+        left: 0;
+        top: 0;
+        display: table;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
+
+    .middle {
+        display: table-cell;
+        vertical-align: middle;
+    }
+
+    .inner {
+        margin-left: auto;
+        margin-right: auto;
+        width: 512px;
+    }
+
+    .form-control {
+        color: #000000;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="outer">
+    <div class="middle">
+        <div class="inner">
+            <h2 style="text-align: center;"><b>PortalName</b></h2>
+            {% if error is empty %}
+            {% else %}
+            <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-danger">{{error}}</a>
+            </div>
+            {% endif %}
+            <form action="{{ contextPath }}/login" method="POST">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input type="text" name="app_username" class="form-control" placeholder="Username"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input type="password" name="app_password" class="form-control" placeholder="Password"/>
+                        </div>
+                    </div>
+                </div>
+                <!--<input type="checkbox" name="remember-me-param"/>Remember Me? <br/>-->
+                <div class="row">
+                    <div class="col-md-6">
+                        <input class="btn btn-default btn-block" type="submit" value="Login"/>
+                    </div>
+                    <div class="col-md-6">
+                        <input class="btn btn-default btn-block" type="reset" value="Reset"/>
+                    </div>
+                </div>
+                <input name="_csrf" value="{{ _csrf }}" type="hidden">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

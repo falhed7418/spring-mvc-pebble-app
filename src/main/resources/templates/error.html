@@ -1,0 +1,28 @@
+{% extends "templates/base.html" %}
+
+{% block title %}Error page{% endblock %}
+{% block content %}<h1>{{ exceptionClass }} : {{ exceptionMessage }}</h1>
+
+<table class="table table-bordered table-hover">
+    <thead></thead>
+    <tbody>
+    <tr>
+        <th>#</th>
+        <th>File</th>
+        <th>Method</th>
+        <th>Line</th>
+        <th>Class</th>
+    </tr>
+    {% for stackTrace in stackTraceList %}
+    <tr>
+        <th scope="row">{{loop.index}}</th>
+        <td>{{ stackTrace.fileName }}</td>
+        <td>{{ stackTrace.methodName }}</td>
+        <td>{{ stackTrace.lineNumber }}</td>
+        <td>{{ stackTrace.className }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "templates/secured/secured.html" %}
+
+{% block title %}Access Denied{% endblock %}
+
+{% block style %}
+{{ parent() }}
+{% endblock %}
+
+{% block content %}
+{{ parent() }}
+<h1 style="color:#F00;">Sorry, Access is denied !!!</h1>
+{% endblock %}
